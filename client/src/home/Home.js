@@ -1,9 +1,32 @@
 import React, { Component } from 'react';
-
+import axios from 'axios';
 class Home extends Component {
   login() {
     this.props.auth.login();
   }
+
+  componentDidMount() {
+
+    axios.get(`http://localhost:3001/api/public`)
+      .then(response => {
+        console.log(response.data.message);
+      })
+      .catch(error => {
+        console.log(error);
+      }); 
+
+    const { getAccessToken } = this.props.auth;
+    const API_URL = "http://localhost:3001/api";;
+    const headers = { 'Authorization': `Bearer ${getAccessToken()}` }
+    axios.get(`${API_URL}/private`, { headers })
+      .then(response => {
+        console.log(response.data.message);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
   render() {
     const { isAuthenticated } = this.props.auth;
     return (

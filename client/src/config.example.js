@@ -4,5 +4,6 @@ export const AUTH_CONFIG = {
     redirectUri: '',
     audience: '',
     responseType: 'token id_token',
-    scope: 'openid'
+    scope: 'openid',
+    apiUrl: ''
 }

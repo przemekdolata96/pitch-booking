@@ -9,18 +9,27 @@ export default class Auth {
         redirectUri: AUTH_CONFIG.redirectUri,
         audience: AUTH_CONFIG.audience,
         responseType: AUTH_CONFIG.responseType,
-        scope: AUTH_CONFIG.scope
+        scope: AUTH_CONFIG.scope,
     });
-
+    
     constructor() {
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
         this.handleAuthentication = this.handleAuthentication.bind(this);
         this.isAuthenticated = this.isAuthenticated.bind(this);
+        this.getAccessToken = this.getAccessToken.bind(this);
     }
 
     login() {
         this.auth0.authorize();
+    }
+
+    getAccessToken() {
+        const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) {
+            throw new Error('No access token found');
+        }
+        return accessToken;
     }
 
     handleAuthentication() {
