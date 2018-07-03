@@ -3,7 +3,7 @@ import {
   Navbar,
   Button
 } from 'react-bootstrap';
-import './App.css';
+import './App.scss';
 
 class App extends Component {
   goTo(route) {
