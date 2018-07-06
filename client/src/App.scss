@@ -34,3 +34,15 @@
     background-color: #00f;
   }
 }
+
+.home-container{
+  width: 100%;
+  height: 100vh;
+  background: url('./images/soccer.jpg') center bottom;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  clip-path: circle(85% at 0% 0%);
+}
+
+
