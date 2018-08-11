@@ -1,0 +1,28 @@
+.phone {
+    height: 600px;
+    width: 300px;
+    background-color: #FFFFFF;
+    border-radius: 30px;
+    border: 2px solid #999;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    display: none;
+    
+
+    .phone-content {
+        position: static;
+        box-sizing: border-box;
+        height: 500px;
+        width: 280px;
+        border: 1px solid black;
+        object-fit: cover;
+    }
+
+    @media (min-width:1024px) {
+        display: flex;
+        position: fixed;
+        top: 20%;
+        left: 55%;
+    }
+}

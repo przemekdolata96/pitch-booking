@@ -35,7 +35,8 @@
   }
 }
 
-.home-container{
+.hero-background{
+  position: fixed;
   width: 100%;
   height: 100vh;
   background: url('./images/soccer.jpg') center bottom;
@@ -43,6 +44,71 @@
   background-size: cover;
   background-repeat: no-repeat;
   clip-path: circle(85% at 0% 0%);
+}
+
+.hero-container {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+
+  img {
+    position: fixed;
+    width: 25%;
+    height: auto;
+    top: 60%;
+    right: 0;
+
+    @media (min-width:768px) {
+      width: 25%;
+      right: 2rem;
+    }
+
+    @media (min-width:1024px) {
+      width: 0;
+      top: 50%;
+    }
+
+    @media (min-width:1366px) {
+      width: 250px;
+      top: 30%;
+    }
+  }
+}
+
+.hero-text {
+  color: white;
+  font-family: 'Roboto',sans-serif;
+  font-weight: 300;
+  font-size: 2.5rem;
+  position: absolute;
+  width: 50%;
+  top: 5%;
+  left: 20%;
+  
+  @media (min-width:576px) {
+    top: 15%;
+    font-size: 3rem;
+  }
+
+  @media (min-width:768px) {
+    font-size: 4rem;
+    top: 20%;
+    left: 10%;
+  }
+}
+
+.login-button-container {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  padding: 2rem;
+
+   @media (min-width:768px) {
+     justify-content: flex-end;
+   }
 }
 
 

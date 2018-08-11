@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
-import {
-  Navbar,
-  Button
-} from 'react-bootstrap';
+
 import './App.scss';
 import { connect } from "react-redux";
 import { fetchNewTime } from './redux/actionCreators';
+import {Button} from "./components/button/Button";
+import {Phone} from "./components/phone/Phone";
+import logo from "./images/football.svg";
+import history from './history';
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.login = this.login.bind(this);
+  }
 
   goTo(route) {
     this.props.history.replace(`/${route}`)
@@ -20,12 +26,29 @@ class App extends Component {
     this.props.auth.logout();
   }
 
-  render() {
+  componentDidMount() {
     const { isAuthenticated } = this.props.auth;
+    
+    if(isAuthenticated() === true) {
+      history.push('home')
+      console.log('push history home')
+    }
+  }
+
+  render() {
 
     return(
-      <div className="home-container">
-      </div>
+     <div>
+        <div className="hero-background"></div>
+        <div className="hero-container">
+          <h2 className="hero-text">zarezerwuj termin i graj ze znajomymi na wybranych boiskach</h2>
+          <div className="login-button-container">
+            <Button text="Zaloguj" className="button primary medium" click={this.login}></Button>
+          </div>
+          <Phone image={logo} ></Phone>
+          <img src={logo} alt="football icon"/>
+        </div>
+     </div>
     ) 
   }
 }
