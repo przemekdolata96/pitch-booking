@@ -12,6 +12,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var publicRouter = require('./routes/public');
 var privateRouter = require('./routes/private');
+import pitchRouter from './routes/pitches';
 import { MONGO_CONFIG } from "./config";
 
 //mongo setup
@@ -35,6 +36,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/public', publicRouter);
 app.use('/api/private', privateRouter);
+app.use('/api/pitches',pitchRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -10,19 +10,17 @@ import history from './history';
 class App extends Component {
   constructor(props) {
     super(props);
-
-    this.login = this.login.bind(this);
   }
 
   goTo(route) {
     this.props.history.replace(`/${route}`)
   }
 
-  login() {
+  login = () => {
     this.props.auth.login();
   }
 
-  logout() {
+  logout = () => {
     this.props.auth.logout();
   }
 

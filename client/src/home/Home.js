@@ -1,8 +1,23 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 class Home extends Component {
+  constructor(props) {
+    super(props);
+
+    const { isAuthenticated } = this.props.auth;
+    
+    if (isAuthenticated() === false) {
+      this.props.history.push('')
+    }
+  }
+
   login() {
     this.props.auth.login();
+  }
+
+  logout = () => {
+    this.props.auth.logout(); 
+    this.props.history.push('');
   }
 
   componentDidMount() {
@@ -33,9 +48,12 @@ class Home extends Component {
       <div className="container">
         {
           isAuthenticated() && (
-              <h4>
-                You are logged in!
-              </h4>
+              <div>
+                <h4>
+                  You are logged in!
+                </h4>
+                <button onClick={this.logout}>Wyloguj</button>
+              </div>
             )
         }
         {

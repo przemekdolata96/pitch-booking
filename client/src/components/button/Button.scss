@@ -1,6 +1,5 @@
 button.button {
     width: 10rem;
-    height: 4rem;
     text-align: center;
     border: 1px solid transparent;
     border-radius: 2rem;
@@ -10,11 +9,13 @@ button.button {
     display: block;
     background-size: 200% auto;
     transition: 0.5s;
+    outline: none;
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
     0 10px 10px rgba(0, 0, 0, 0.22);
 
     &:hover {
         background-position: right center;
+        transform: scale(1.05);
     }
 }
 
@@ -29,9 +30,11 @@ button.small {
 button.medium {
     width: 15rem;
     font-size: 1.5rem;
+    line-height: 1.5rem;
 }
 
 button.large {
     width: 20rem;
     font-size: 2rem;
+    line-height: 2rem;
 }
