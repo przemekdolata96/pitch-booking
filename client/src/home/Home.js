@@ -20,9 +20,46 @@ class Home extends Component {
     this.props.history.push('');
   }
 
+  getProfile = () => {
+    return localStorage.getItem('user_id');
+  }
+
+  getProfiles = () => {
+   /*  axios.get('http://localhost:3001/api/users')
+      .then(response => {
+        return response.data
+      })
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.log(error)
+      }) */
+    console.log(new Date().getTime())
+  }
+
   componentDidMount() {
 
-    axios.get(`http://localhost:3001/api/public`)
+    //console.log(this.props.auth.getProfile())
+
+  /*   axios.post('http://localhost:3001/api/users/create',{
+      user_id: localStorage.getItem('user_id'),
+      name: localStorage.getItem('name'),
+    }); */
+
+    
+   /*  axios.get('https://localhost:3000/callback#id_token=' + this.props.auth.getAccessToken())
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(error);
+      });  */
+
+    //console.log(this.props.auth.userInfo())
+    //this.props.auth.getAccessToken()
+
+    /* axios.get(`http://localhost:3001/api/public`)
       .then(response => {
         console.log(response.data.message);
       })
@@ -39,7 +76,7 @@ class Home extends Component {
       })
       .catch(error => {
         console.log(error);
-      });
+      }); */
   }
 
   render() {
@@ -53,6 +90,7 @@ class Home extends Component {
                   You are logged in!
                 </h4>
                 <button onClick={this.logout}>Wyloguj</button>
+                <button onClick={this.getProfiles}>Get profile</button>
               </div>
             )
         }

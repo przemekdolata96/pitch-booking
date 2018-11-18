@@ -1,35 +1,47 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
+const { Pitch } = require('../sequalize');
 
-const Pitch = require('../models/pitch');
+//const checkJwt = require('../jwtConf')
 /* This route doesn't need authentication */
-router.get('/', function (req, res) {
-    const query = Pitch.find({}).select('_id name');
-    
-    query.exec(function (err, pitches) {
-        if (err) return next(err);
-        res.json({
-            pitches: pitches
-        });
-    })
+router.get('/pitch/:id', (req, res, next) => {
+	Pitch.findAll({
+		where: {
+			id: decodeURIComponent(req.params.id)
+		}
+	})
+		.then(result => {
+			res.status(200).send(result);
+		})
+		.catch(() => {
+			res.status(500).send('no pitches find');
+		})
 });
 
-router.post('/', function (req, res) {
-    const pitch = new Pitch({
-        _id: new mongoose.Types.ObjectId(),
-        name: 'Pitch Name',
-        dates: {}
-    })
-    pitch.save()
-        .then(result => {
-            console.log(result);
-        })
-        .catch(err => console.log(err));
-    res.status(201).json({
-        message: "Handling POST",
-        pitch: pitch
-    })
+router.get('/pitches', (req, res, next) => {
+	Pitch.findAll()
+		.then(result => {
+			res.status(200).send(result);
+		})
+		.catch(() => {
+			res.status(500).send('no pitches find');
+		})
+});
+
+router.post('/pitch', (req, res, next) => {
+	Pitch.create(
+		{
+			name: req.body.name,
+			city: req.body.city,
+			address: req.body.address,
+		}
+	)
+		.then(() => {
+			res.status(200).send('pitch added!');
+		})
+		.catch(() => {
+			res.status(500).send('pitch is not added!');
+		})
 });
 
 module.exports = router;

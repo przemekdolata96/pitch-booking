@@ -1,6 +1,7 @@
 import auth0 from 'auth0-js';
 import history from "../history";
 import { AUTH_CONFIG } from "../config";
+import axios from 'axios';
 
 export default class Auth {
     auth0 = new auth0.WebAuth({
@@ -18,6 +19,7 @@ export default class Auth {
         this.handleAuthentication = this.handleAuthentication.bind(this);
         this.isAuthenticated = this.isAuthenticated.bind(this);
         this.getAccessToken = this.getAccessToken.bind(this);
+        this.getProfile = this.getProfile.bind(this);
     }
 
     login() {
@@ -32,11 +34,23 @@ export default class Auth {
         return accessToken;
     }
 
+    getProfile() {
+        return this.profile;
+    }
+
     handleAuthentication() {
         this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.setSession(authResult);
                 history.replace('/home');
+                console.log(authResult)
+                //this.profile = authResult;
+                localStorage.setItem('id', authResult.idTokenPayload.sub);
+                localStorage.setItem('name', authResult.idTokenPayload.name);
+                axios.post('http://localhost:3001/api/user', {
+                    id: authResult.idTokenPayload.sub,
+                    name: authResult.idTokenPayload.name,
+                });
             } else if (err) {
                 history.replace('/home');
                 console.log(err);
@@ -59,6 +73,8 @@ export default class Auth {
         localStorage.removeItem('access_token');
         localStorage.removeItem('id_token');
         localStorage.removeItem('expires_at');
+        localStorage.removeItem('id');
+        localStorage.removeItem('name');
         // navigate to the home route
         history.replace('/home');
     }
