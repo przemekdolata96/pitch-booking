@@ -1,0 +1,21 @@
+.user-profile {
+  padding-left: 24px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  align-items: center;
+
+  .user-name {
+    display: flex;
+    flex-wrap: nowrap;
+    color: white;
+    font-weight: 500;
+    margin-left: 10px;
+    overflow: hidden;
+    white-space:nowrap;
+  }
+  
+  .user-name.hidden {
+    width: 0;
+  }
+}

@@ -42,11 +42,12 @@ export default class Auth {
         this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.setSession(authResult);
-                history.replace('/home');
                 console.log(authResult)
                 //this.profile = authResult;
                 localStorage.setItem('id', authResult.idTokenPayload.sub);
                 localStorage.setItem('name', authResult.idTokenPayload.name);
+                localStorage.setItem('picture', authResult.idTokenPayload.picture);
+                history.replace('/home');
                 axios.post('http://localhost:3001/api/user', {
                     id: authResult.idTokenPayload.sub,
                     name: authResult.idTokenPayload.name,
@@ -75,6 +76,7 @@ export default class Auth {
         localStorage.removeItem('expires_at');
         localStorage.removeItem('id');
         localStorage.removeItem('name');
+        localStorage.removeItem('picture');
         // navigate to the home route
         history.replace('/home');
     }

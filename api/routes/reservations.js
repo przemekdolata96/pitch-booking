@@ -22,6 +22,20 @@ router.get('/reservations/:date/:pitchId', (req, res, next) => {
     })
 });
 
+router.get('/reservations/:userid', (req, res, next) => {
+  Reservation.findAll({
+    where: {
+      userId: req.params.userid,
+    }
+  })
+    .then(result => {
+      res.status(200).send(result);
+    })
+    .catch(() => {
+      res.status(500).send('no pitches find');
+    })
+});
+
 router.get('/reservations', (req, res, next) => {
   Reservation.findAll()
     .then(result => {

@@ -1,0 +1,25 @@
+.reservation-container {
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .time {
+    display: flex;
+    flex-wrap: wrap;
+    width: 150px;
+    justify-content: space-between;
+    
+    i {
+      margin-right: 10px;
+    }
+  }
+
+  .place {
+    font-size: 16px;
+    font-weight: 500;
+    padding-right: 50px;
+    padding-left: 50px;
+  }
+}

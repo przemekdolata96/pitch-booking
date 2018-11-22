@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import './App.scss';
 import { connect } from "react-redux";
-import { fetchNewTime } from './redux/actionCreators';
+import { fetchReservations } from './redux/actions/reservations';
 import {Button} from "./components/button/Button";
 import {Phone} from "./components/phone/Phone";
 import logo from "./images/football.svg";
@@ -50,35 +50,15 @@ class App extends Component {
     ) 
   }
 }
-{/* <div>
-  <Navbar fluid>
-    <Navbar.Header>
-      <Navbar.Brand>
-        <a href="#">Auth0 - React</a>
-      </Navbar.Brand>
-      <Button bsStyle="primary" className="btn-margin" onClick={this.goTo.bind(this, "home")}>
-        Home
-      </Button>
-      {!isAuthenticated() && <Button id="qsLoginBtn" bsStyle="primary" className="btn-margin" onClick={this.login.bind(this)}>
-          Log In
-        </Button>}
-      {isAuthenticated() && <Button id="qsLogoutBtn" bsStyle="primary" className="btn-margin" onClick={this.logout.bind(this)}>
-          Log Out
-        </Button>}
-    </Navbar.Header>
-  </Navbar>
-  <div>Current Time: {this.props.currentTime}</div>
-  <Button onClick={this.props.updateTime}>Update Time</Button>
-</div> */}
 
 const mapStateToProps = state => {
   return {
-    currentTime: state.currentTime
+    reservations: state.reservations.reservations
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  updateTime: () => dispatch(fetchNewTime())
+  fetchReservations: () => dispatch(fetchReservations())
 });
 
 export default connect(
