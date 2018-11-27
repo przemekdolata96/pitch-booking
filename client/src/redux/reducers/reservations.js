@@ -1,5 +1,5 @@
 // Initial (starting) state
-import { FETCH_RESERVATIONS } from "../actions/actionTypes";
+import { FETCH_RESERVATIONS, REMOVE_RESERVATION } from "../actions/actionTypes";
 export const initialState = {
     reservations: []
 }
@@ -9,7 +9,11 @@ export const initialState = {
 export const reducer = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_RESERVATIONS:
-            return { ...state, reservations: action.payload }
+            return { ...state, reservations: action.payload };
+        case REMOVE_RESERVATION:
+            return {...state, reservations: state.reservations.filter(reservation => {
+                return reservation.id !== action.payload
+            })}
         default:
             return state;
     }

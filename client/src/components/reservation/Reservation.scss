@@ -16,10 +16,46 @@
     }
   }
 
+  .data {
+    padding-right: 50px;
+  }
+
   .place {
     font-size: 16px;
     font-weight: 500;
     padding-right: 50px;
     padding-left: 50px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .reservation-container {
+    justify-content: center;
+    border: solid 0.5px #EEE;
+    padding: 10px;
+    
+    .time {
+      width: 100%;
+      justify-content: center;
+      
+      span {
+        padding: 0 10px 0 10px;
+      }
+    }
+
+    .data {
+      width: 100%;
+      padding-right: 0;
+      padding-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .place {
+    width: 100%;
+    text-align: center;
+    padding-bottom: 20px;
+    padding-top: 20px;
   }
 }

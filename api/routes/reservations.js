@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Reservation } = require('../sequalize');
+const { Reservation, Pitch } = require('../sequalize');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op
 
@@ -26,7 +26,8 @@ router.get('/reservations/:userid', (req, res, next) => {
   Reservation.findAll({
     where: {
       userId: req.params.userid,
-    }
+    },
+    include: [Pitch]
   })
     .then(result => {
       res.status(200).send(result);
@@ -82,6 +83,20 @@ router.post('/reservation', (req, res, next) => {
   .catch(error => {
     res.status(500).send(error);
   })
+});
+
+router.delete('/reservation/:id', (req, res, next) => {
+  Reservation.destroy({
+    where: {
+      id: req.params.id,
+    }
+  })
+    .then(result => {
+      res.status(200).send('pitch deleted');
+    })
+    .catch(() => {
+      res.status(500).send('pitch can not be deleted');
+    })
 });
 
 module.exports = router;

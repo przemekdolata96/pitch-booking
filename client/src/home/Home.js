@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { connect } from "react-redux";
-import { fetchAllReservations } from '../redux/actions/reservations';
+import { fetchAllReservations, deleteReservation } from '../redux/actions/reservations';
 import 'antd/dist/antd.css';
 import './Home.scss';
 import UserProfile from "../components/user-profile/UserProfile";
@@ -30,12 +30,7 @@ class Home extends Component {
   };
 
   onCollapse = (collapsed) => {
-    console.log(collapsed);
     this.setState({ collapsed });
-  }
-
-  login() {
-    this.props.auth.login();
   }
 
   logout = () => {
@@ -43,71 +38,25 @@ class Home extends Component {
     this.props.history.push('');
   }
 
-  getProfile = () => {
-    return localStorage.getItem('picture');
-  }
-
-  getProfiles = () => {
-   /*  axios.get('http://localhost:3001/api/users')
-      .then(response => {
-        return response.data
-      })
-      .then(data => {
-        console.log(data)
-      })
-      .catch(error => {
-        console.log(error)
-      }) */
-    console.log(new Date().getTime())
-  }
-
   componentDidMount() {
-    setTimeout(() => {
-      this.props.fetchAllReservations(localStorage.getItem('id'))
-    }, 1000);
-    console.log('REZERWACJE',this.props.reservations)
-   
-    //console.log(this.props.auth.getProfile())
+    this.props.fetchAllReservations(localStorage.getItem('id'))
 
-  /*   axios.post('http://localhost:3001/api/users/create',{
-      user_id: localStorage.getItem('user_id'),
-      name: localStorage.getItem('name'),
-    }); */
-
-    
-   /*  axios.get('https://localhost:3000/callback#id_token=' + this.props.auth.getAccessToken())
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {
-        console.log(error);
-      });  */
-
-    //console.log(this.props.auth.userInfo())
-    //this.props.auth.getAccessToken()
-
-    /* axios.get(`http://localhost:3001/api/public`)
-      .then(response => {
-        console.log(response.data.message);
-      })
-      .catch(error => {
-        console.log(error);
-      }); 
-
-    const { getAccessToken } = this.props.auth;
-    const API_URL = "http://localhost:3001/api";;
-    const headers = { 'Authorization': `Bearer ${getAccessToken()}` }
-    axios.get(`${API_URL}/private`, { headers })
-      .then(response => {
-        console.log(response.data.message);
-      })
-      .catch(error => {
-        console.log(error);
-      }); */
   }
 
   render() {
-    const { isAuthenticated } = this.props.auth;
+    //const { isAuthenticated } = this.props.auth;
+    const reservations = this.props.reservations.map(reservation =>
+      (
+        <Reservation
+          key={reservation.id}
+          date={reservation.date}
+          startTime={reservation.start_time}
+          endTime={reservation.end_time}
+          place={`${reservation.pitch.city}, ${reservation.pitch.address}`}
+          onDelete={() => this.props.removeReservation(reservation.id)}
+        />
+      )
+    )
     return (
             <Layout>
                 <Sider
@@ -139,13 +88,7 @@ class Home extends Component {
                 <Header style={{ background: '#fff', padding: 0,}} />
                 <Content style={{ padding: 20, minHeight: 'calc(100vh - 64px)' }}>
                   <div style={{ padding: 24, background: '#fff', minHeight: 750 }}>
-                    <Reservation 
-                      date="12/11/2018"
-                      startTime="10:15"
-                      endTime="11:15"
-                      place="Wrocław, plac Grunwaldzki 22"
-                      onDelete={() => {console.log("delete reservation")}}
-                    />
+                    {reservations}
                   </div>
                 </Content>
                 {/* <Footer style={{ textAlign: 'center' }}>
@@ -165,7 +108,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => ({
-  fetchAllReservations: (userId) => dispatch(fetchAllReservations(userId))
+  fetchAllReservations: (userId) => dispatch(fetchAllReservations(userId)),
+  removeReservation: (reservationId) => dispatch(deleteReservation(reservationId))
 });
 
 export default connect(

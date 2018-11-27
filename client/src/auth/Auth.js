@@ -66,7 +66,7 @@ export default class Auth {
         localStorage.setItem('id_token', authResult.idToken);
         localStorage.setItem('expires_at', expiresAt);
         // navigate to the home route
-        history.replace('/home');
+        //history.replace('/home');
     }
 
     logout() {

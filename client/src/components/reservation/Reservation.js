@@ -5,16 +5,15 @@ import { Icon, Tag, Button} from 'antd';
 export default (props) => {
   return (
     <div className="reservation-container">
-      <Tag style={{marginRight:50}}>{props.date}</Tag>
+      <div className="data">
+        <Tag style={{marginRight:0}}>{props.date}</Tag>
+      </div>
       <div className="time">
-        <Tag color="green">{props.startTime}</Tag>
-        <div>
-          <Icon type="minus"/>
-        </div>
-        <Tag color="green">{props.endTime}</Tag>
+        <Tag style={{marginRight:0}} color="green">{props.startTime}</Tag>
+        <span>-</span>
+        <Tag style={{marginRight:0}} color="green">{props.endTime}</Tag>
       </div>
       <span className="place">{props.place}</span>
-      {/* <Icon type="delete" onClick={props.onDelete} /> */}
       <Button type="danger" onClick={props.onDelete}>Usuń</Button>
     </div>
   )
