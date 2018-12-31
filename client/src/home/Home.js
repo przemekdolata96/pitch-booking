@@ -6,11 +6,15 @@ import 'antd/dist/antd.css';
 import './Home.scss';
 import UserProfile from "../components/user-profile/UserProfile";
 import Reservation from "../components/reservation/Reservation";
+import { Layout, Menu, Breadcrumb, Icon, Avatar, Tabs, Card, AutoComplete, Button, TimePicker, DatePicker} from 'antd';
+import moment from 'moment';
+import Calendar from "../components/calendar/Calendar";
 
-import { Layout, Menu, Breadcrumb, Icon, Avatar } from 'antd';
 
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
+const TabPane = Tabs.TabPane;
+const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
 
 class Home extends Component {
   constructor(props) {
@@ -27,6 +31,23 @@ class Home extends Component {
     collapsed: false,
     userPhoto: localStorage.getItem('picture'),
     userName: localStorage.getItem('name'),
+    cityInput: '',
+    streetInput: '',
+    pitches: [],
+    menuOption: 1,
+    selectedPitchID: null,
+    selectedTabKey: '1',
+    events: [
+      {
+        title: 'Click for Google',
+        start: '2018-12-30T07:00:00',
+        end: '2018-12-30T07:30:00',
+        color: 'black'
+      }
+    ],
+    selectedDate: moment().format('YYYY-MM-DD'),
+    reservationStartTime:null,
+    reservationEndTime:null,
   };
 
   onCollapse = (collapsed) => {
@@ -40,7 +61,101 @@ class Home extends Component {
 
   componentDidMount() {
     this.props.fetchAllReservations(localStorage.getItem('id'))
+  }
 
+  fetchPitches = () => {
+    axios.get(`http://localhost:3001/api/pitches/?city=${this.state.cityInput}&address=${this.state.streetInput}`)
+    .then(response => {
+      this.setState({
+        pitches: response.data
+      })
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
+
+  fetchReservations = () => {
+    const userID = localStorage.getItem('id');
+    axios.get(`http://localhost:3001/api/reservations/${this.state.selectedDate}/${this.state.selectedPitchID}`)
+    .then(response => {
+      console.log(response)
+      const reservations = response.data.map(reservation => {
+        let color = reservation.userId === userID ? 'blue' : 'red'
+        return {
+          title: 'Rezerwacja',
+          start: `${reservation.date}T${reservation.start_time}`,
+          end: `${reservation.date}T${reservation.end_time}`,
+          color: color
+        }
+      })
+      this.setState({
+        events: reservations
+      })
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
+
+  inputCity = (cityInput) => {
+    this.setState({
+      cityInput: cityInput
+    },this.fetchPitches)
+  }
+
+  inputStreet = (streetInput) => {
+    this.setState({
+      streetInput: streetInput
+    },this.fetchPitches)
+  }
+
+  menuOptionChange = (option) => {
+    this.setState({
+      menuOption: option
+    })
+  }
+
+  pitchChooseHandler = (pitchID) => {
+    this.setState({
+      selectedPitchID: pitchID,
+      selectedTabKey: '2',
+    })
+  }
+
+  createReservation = () => {
+    console.log(this.state.reservationStartTime,this.state.reservationEndTime,this.state.selectedDate)
+    axios.post('http://localhost:3001/api/reservation',{
+      date: this.state.selectedDate,
+      startTime: this.state.reservationStartTime,
+      endTime: this.state.reservationEndTime,
+      pitchId: this.state.selectedPitchID,
+      userId: localStorage.getItem('id')
+    })
+    .then(response => {
+      console.log(response)
+    })
+    .catch(err => {
+      console.error(err);
+    })
+  }
+
+  dateChangeHandler = (date) => {
+    if(!date || date == 'Invalid date') {
+      this.setState({
+        selectedDate: moment().format('YYYY-MM-DD')
+      },this.fetchReservations)
+    } else {
+      this.setState({
+        selectedDate: moment(date).format('YYYY-MM-DD')
+      },this.fetchReservations)
+    }
+  }
+
+  tabChangeHandler = (tabKey) => {
+    this.setState({
+      selectedTabKey: tabKey
+    })
   }
 
   render() {
@@ -57,6 +172,78 @@ class Home extends Component {
         />
       )
     )
+
+    const dateFormat = 'YYYY/MM/DD';
+
+    let pitches;
+
+    if(this.state.pitches.length > 0) {
+      pitches = this.state.pitches.map(pitch => (
+        <Card title={pitch.name} bordered={false} style={{ width: 300 }}>
+          <Button type="primary" onClick={() => this.pitchChooseHandler(pitch.id)}>Wybierz</Button>
+          <p>{pitch.city}</p>
+          <p>{pitch.address}</p>
+        </Card>
+      ))
+    } else {
+      pitches = "Nie znaleziono boisk"
+    }
+
+    let content;
+
+    switch (this.state.menuOption) {
+      case 1:
+          content = reservations
+        break;
+      case 2:
+          content = 
+            <Tabs defaultActiveKey="1" onChange={key => this.tabChangeHandler(key)} activeKey={this.state.selectedTabKey}>
+              <TabPane tab="Wybór boiska" key="1">
+                <div style={{ background: '#ECECEC', padding: '30px' }}>
+                  <AutoComplete
+                    style={{ width: 200 }}
+                    dataSource={dataSource}
+                    placeholder="Miasto"
+                    filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                    onSearch={inputValue => this.inputCity(inputValue)}
+                    value= {this.state.cityInput}
+                  />
+                  <AutoComplete
+                    style={{ width: 200 }}
+                    dataSource={dataSource}
+                    placeholder="Ulica"
+                    filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                    onSearch={inputValue => { this.inputStreet(inputValue) }}
+                    value={this.state.streetInput}
+                  />
+                  {pitches}
+                </div>
+              </TabPane>
+              <TabPane tab="Rezerwacja" key="2">
+              <TimePicker defaultValue={moment('00:00', 'HH:mm')} format='HH:mm' minuteStep={15} onChange={(value, timestring) => this.setState({ reservationStartTime: timestring})}/>
+              <TimePicker defaultValue={moment('00:00', 'HH:mm')} format='HH:mm' minuteStep={15} onChange={(value, timestring) => this.setState({ reservationEndTime: timestring})}/>
+                <Button type="primary" onClick={this.createReservation}>Zarezerwuj</Button>
+                <DatePicker 
+                  defaultValue={moment(new Date(), dateFormat)}
+                  format={dateFormat}
+                  onChange={this.dateChangeHandler}
+                />
+                { this.state.selectedPitchID ? 
+                  <Calendar 
+                    events={this.state.events}
+                    date={this.state.selectedDate}
+                  >
+                  </Calendar>
+                  :
+                  <div>Nie wybrano boiska</div>
+                }
+              </TabPane>
+            </Tabs>
+        break;
+    
+      default:
+        break;
+    }
     return (
             <Layout>
                 <Sider
@@ -70,11 +257,11 @@ class Home extends Component {
                     collapsed={this.state.collapsed}
                   />
                   <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-                    <Menu.Item key="1">
+                    <Menu.Item key="1" onClick={() => this.menuOptionChange(1)}>
                       <Icon type="pie-chart" />
                       <span>Moje rezerwacje</span>
                     </Menu.Item>
-                    <Menu.Item key="2">
+                    <Menu.Item key="2" onClick={() => this.menuOptionChange(2)}>
                       <Icon type="desktop" />
                       <span>Zarezerwuj boisko</span>
                     </Menu.Item>
@@ -88,7 +275,7 @@ class Home extends Component {
                 <Header style={{ background: '#fff', padding: 0,}} />
                 <Content style={{ padding: 20, minHeight: 'calc(100vh - 64px)' }}>
                   <div style={{ padding: 24, background: '#fff', minHeight: 750 }}>
-                    {reservations}
+                    {content}
                   </div>
                 </Content>
                 {/* <Footer style={{ textAlign: 'center' }}>

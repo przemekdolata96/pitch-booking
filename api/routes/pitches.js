@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { Pitch } = require('../sequalize');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op
 
 //const checkJwt = require('../jwtConf')
 /* This route doesn't need authentication */
@@ -15,6 +17,29 @@ router.get('/pitch/:id', (req, res, next) => {
 		})
 		.catch(() => {
 			res.status(500).send('no pitches find');
+		})
+});
+
+router.get('/pitches', (req, res, next) => {
+	Pitch.findAll({
+		where: {
+			[Op.and]:[
+				{
+					city: {
+						[Op.like]: '%' + req.query.city + '%'
+					},
+					address: {
+						[Op.like]: '%' + req.query.address + '%'
+					}
+				},
+			]
+		}
+	})
+		.then(result => {
+			res.status(200).send(result);
+		})
+		.catch(error => {
+			res.status(500).send(error);
 		})
 });
 
