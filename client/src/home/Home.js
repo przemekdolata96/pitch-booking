@@ -36,6 +36,7 @@ class Home extends Component {
     pitches: [],
     menuOption: 1,
     selectedPitchID: null,
+    selectedPitchInfo: null,
     selectedTabKey: '1',
     events: [],
     selectedDate: moment().format('YYYY-MM-DD'),
@@ -113,9 +114,10 @@ class Home extends Component {
     })
   }
 
-  pitchChooseHandler = (pitchID) => {
+  pitchChooseHandler = (pitchID, info) => {
     this.setState({
       selectedPitchID: pitchID,
+      selectedPitchInfo: info,
       selectedTabKey: '2',
     }, () => {
       this.fetchReservations()
@@ -215,7 +217,14 @@ class Home extends Component {
     if(this.state.pitches.length > 0) {
       pitches = this.state.pitches.map(pitch => (
         <Card title={pitch.name} bordered={true} style={{ width: 300, marginRight: 10, marginBottom: 10, borderColor: '#CCC' }}>
-          <Button type="primary" onClick={() => this.pitchChooseHandler(pitch.id)}>Wybierz</Button>
+          <Button 
+            type="primary"
+            onClick={() => this.pitchChooseHandler(pitch.id, {
+              pitchName:pitch.name,
+              pitchCity:pitch.city,
+              pitchAddress:pitch.address,
+            })}
+          >Wybierz</Button>
           <p>{pitch.city}</p>
           <p>{pitch.address}</p>
         </Card>
@@ -302,6 +311,9 @@ class Home extends Component {
                 >Zarezerwuj</Button>
                 { this.state.message &&
                   <span className="info">{this.state.message}</span>
+                }
+                { this.state.selectedPitchInfo &&
+                  <div className="pitch-info"><span>{`${this.state.selectedPitchInfo.pitchName} - ${this.state.selectedPitchInfo.pitchCity} - ${this.state.selectedPitchInfo.pitchAddress}`}</span></div>
                 }
                 { this.state.selectedPitchID ? 
                   <Calendar 
