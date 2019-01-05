@@ -19,3 +19,13 @@
     width: 0;
   }
 }
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.info {
+  color: red;
+  font-size: 16px;
+}

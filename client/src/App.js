@@ -43,7 +43,7 @@ class App extends Component {
           <div className="login-button-container">
             <Button text="Zaloguj" className="button primary medium" click={this.login}></Button>
           </div>
-          <Phone image={logo} ></Phone>
+          {/* <Phone image={logo} ></Phone> */}
           <img src={logo} alt="football icon"/>
         </div>
      </div>

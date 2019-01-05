@@ -4,7 +4,7 @@ const { Pitch } = require('../sequalize');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op
 
-//const checkJwt = require('../jwtConf')
+const checkJwt = require('../jwtConf')
 /* This route doesn't need authentication */
 router.get('/pitch/:id', (req, res, next) => {
 	Pitch.findAll({

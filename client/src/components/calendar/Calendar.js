@@ -15,7 +15,8 @@ export class Calendar extends Component {
 
     $(calendar).fullCalendar({
       header: {
-        left: 'prev,next,today',
+        left: '',
+        /* left: 'prev,next,today', */
         center: 'title',
         right: ''
       },

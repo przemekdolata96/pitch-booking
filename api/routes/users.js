@@ -3,7 +3,7 @@ var router = express.Router();
 
 const { User } = require('../sequalize');
 
-//const checkJwt = require('../jwtConf')
+const checkJwt = require('../jwtConf')
 
 /* GET users listing. */
 router.get('/user/:id', (req, res, next) => {

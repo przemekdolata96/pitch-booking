@@ -6,7 +6,7 @@ import 'antd/dist/antd.css';
 import './Home.scss';
 import UserProfile from "../components/user-profile/UserProfile";
 import Reservation from "../components/reservation/Reservation";
-import { Layout, Menu, Breadcrumb, Icon, Avatar, Tabs, Card, AutoComplete, Button, TimePicker, DatePicker} from 'antd';
+import { Layout, Menu, Icon, Tabs, Card, AutoComplete, Button, TimePicker, DatePicker, message} from 'antd';
 import moment from 'moment';
 import Calendar from "../components/calendar/Calendar";
 
@@ -31,23 +31,20 @@ class Home extends Component {
     collapsed: false,
     userPhoto: localStorage.getItem('picture'),
     userName: localStorage.getItem('name'),
-    cityInput: '',
+    cityInput: 'Wrocław',
     streetInput: '',
     pitches: [],
     menuOption: 1,
     selectedPitchID: null,
     selectedTabKey: '1',
-    events: [
-      {
-        title: 'Click for Google',
-        start: '2018-12-30T07:00:00',
-        end: '2018-12-30T07:30:00',
-        color: 'black'
-      }
-    ],
+    events: [],
     selectedDate: moment().format('YYYY-MM-DD'),
     reservationStartTime:null,
     reservationEndTime:null,
+    reservationStartMoment:null,
+    reservationEndMoment:null,
+    reservationDisabled: true,
+    message: null,
   };
 
   onCollapse = (collapsed) => {
@@ -61,6 +58,7 @@ class Home extends Component {
 
   componentDidMount() {
     this.props.fetchAllReservations(localStorage.getItem('id'))
+    this.fetchPitches();
   }
 
   fetchPitches = () => {
@@ -79,7 +77,6 @@ class Home extends Component {
     const userID = localStorage.getItem('id');
     axios.get(`http://localhost:3001/api/reservations/${this.state.selectedDate}/${this.state.selectedPitchID}`)
     .then(response => {
-      console.log(response)
       const reservations = response.data.map(reservation => {
         let color = reservation.userId === userID ? 'blue' : 'red'
         return {
@@ -120,11 +117,13 @@ class Home extends Component {
     this.setState({
       selectedPitchID: pitchID,
       selectedTabKey: '2',
+    }, () => {
+      this.fetchReservations()
+      this.validateReservation()
     })
   }
 
   createReservation = () => {
-    console.log(this.state.reservationStartTime,this.state.reservationEndTime,this.state.selectedDate)
     axios.post('http://localhost:3001/api/reservation',{
       date: this.state.selectedDate,
       startTime: this.state.reservationStartTime,
@@ -133,11 +132,47 @@ class Home extends Component {
       userId: localStorage.getItem('id')
     })
     .then(response => {
-      console.log(response)
+      this.fetchReservations();
+      this.setState({
+        reservationDisabled : true
+      },() => {
+          const success = () => {
+            message.success('Rezerwacja została dodana', 10);
+          };
+          success();
+          this.props.fetchAllReservations(localStorage.getItem('id'));
+        setTimeout(() => {
+          this.setState({
+            reservationDisabled: false
+          },this.validateReservation)
+        }, 1000);
+      })
     })
     .catch(err => {
+      const error = () => {
+        message.error('Nie dodano rezerwacji, sprawdź czy termin nie jest już zarezerwowany', 10);
+      };
+      error()
       console.error(err);
     })
+  }
+
+  validateReservation= () => {
+    if(this.state.reservationStartMoment && this.state.reservationEndMoment && this.state.selectedPitchID) {
+      let duration = moment.duration(this.state.reservationEndMoment.diff(this.state.reservationStartMoment ));
+      let minutes = duration.asMinutes();
+      if (minutes < 15 || minutes > 120) {
+        this.setState({
+          message: 'Czas jest niepoprawny (Minimalny czas rezerwacji to 30min a maksymalny 2h)',
+          reservationDisabled: true
+        })
+      } else {
+        this.setState({
+          message: null,
+          reservationDisabled:false
+        })
+      }
+    }
   }
 
   dateChangeHandler = (date) => {
@@ -160,17 +195,17 @@ class Home extends Component {
 
   render() {
     //const { isAuthenticated } = this.props.auth;
-    const reservations = this.props.reservations.map(reservation =>
-      (
-        <Reservation
-          key={reservation.id}
-          date={reservation.date}
-          startTime={reservation.start_time}
-          endTime={reservation.end_time}
-          place={`${reservation.pitch.city}, ${reservation.pitch.address}`}
-          onDelete={() => this.props.removeReservation(reservation.id)}
-        />
-      )
+
+    
+    const reservations = this.props.reservations.map(reservation => {
+      return {
+        date: reservation.date,
+        startTime: reservation.start_time,
+        endTime: reservation.end_time,
+        address: `${reservation.pitch.city}, ${reservation.pitch.address}`,
+        id: reservation.id
+      }
+    }
     )
 
     const dateFormat = 'YYYY/MM/DD';
@@ -179,7 +214,7 @@ class Home extends Component {
 
     if(this.state.pitches.length > 0) {
       pitches = this.state.pitches.map(pitch => (
-        <Card title={pitch.name} bordered={false} style={{ width: 300 }}>
+        <Card title={pitch.name} bordered={true} style={{ width: 300, marginRight: 10, marginBottom: 10, borderColor: '#CCC' }}>
           <Button type="primary" onClick={() => this.pitchChooseHandler(pitch.id)}>Wybierz</Button>
           <p>{pitch.city}</p>
           <p>{pitch.address}</p>
@@ -193,15 +228,20 @@ class Home extends Component {
 
     switch (this.state.menuOption) {
       case 1:
-          content = reservations
+        content = 
+        <Reservation
+          data = {reservations}
+          onDelete={(id) => this.props.removeReservation(id)}
+        />
+          
         break;
       case 2:
           content = 
             <Tabs defaultActiveKey="1" onChange={key => this.tabChangeHandler(key)} activeKey={this.state.selectedTabKey}>
               <TabPane tab="Wybór boiska" key="1">
-                <div style={{ background: '#ECECEC', padding: '30px' }}>
+                <div style={{ /* background: '#ECECEC' */ padding: '30px' }}>
                   <AutoComplete
-                    style={{ width: 200 }}
+                    style={{ width: 200, marginBottom: 10, marginRight: 10 }}
                     dataSource={dataSource}
                     placeholder="Miasto"
                     filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
@@ -209,25 +249,60 @@ class Home extends Component {
                     value= {this.state.cityInput}
                   />
                   <AutoComplete
-                    style={{ width: 200 }}
+                    style={{ width: 200, marginBottom: 10 }}
                     dataSource={dataSource}
                     placeholder="Ulica"
                     filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
                     onSearch={inputValue => { this.inputStreet(inputValue) }}
                     value={this.state.streetInput}
                   />
-                  {pitches}
+                  <div className="cards-container">
+                    {pitches}
+                  </div>
                 </div>
               </TabPane>
               <TabPane tab="Rezerwacja" key="2">
-              <TimePicker defaultValue={moment('00:00', 'HH:mm')} format='HH:mm' minuteStep={15} onChange={(value, timestring) => this.setState({ reservationStartTime: timestring})}/>
-              <TimePicker defaultValue={moment('00:00', 'HH:mm')} format='HH:mm' minuteStep={15} onChange={(value, timestring) => this.setState({ reservationEndTime: timestring})}/>
-                <Button type="primary" onClick={this.createReservation}>Zarezerwuj</Button>
+                <TimePicker 
+                  defaultOpenValue={moment('00:00', 'HH:mm')}
+                  defaultValue={null}
+                  placeholder="Wybierz czas"
+                  allowEmpty={false}
+                  format='HH:mm'
+                  minuteStep={15}
+                  onChange={(value, timestring) => {
+                  this.setState({ reservationStartTime: timestring, reservationStartMoment: value}, this.validateReservation)
+                  }}
+                  style={{marginBottom: 10, marginRight: 10 }}
+                />
+                <TimePicker 
+                  defaultOpenValue={moment('00:00', 'HH:mm')}
+                  defaultValue={null}
+                  placeholder="Wybierz czas"
+                  allowEmpty={false}
+                  format='HH:mm'
+                  minuteStep={15}
+                  onChange={(value, timestring) => {
+                  console.log("EndTime", value)
+                  this.setState({ reservationEndTime: timestring, reservationEndMoment: value}, this.validateReservation)
+                  }}
+                  style={{marginBottom: 10, marginRight: 10 }}
+                />
                 <DatePicker 
                   defaultValue={moment(new Date(), dateFormat)}
                   format={dateFormat}
                   onChange={this.dateChangeHandler}
+                  allowClear={false}
+                  style={{marginBottom: 10, marginRight: 10 }}
                 />
+                <Button 
+                  type="primary"
+                  onClick={this.createReservation}
+                  disabled={this.state.reservationDisabled}
+                  style={{ marginBottom: 10, marginRight: 10 }}
+                >Zarezerwuj</Button>
+                { this.state.message &&
+                  <span className="info">{this.state.message}</span>
+                }
                 { this.state.selectedPitchID ? 
                   <Calendar 
                     events={this.state.events}
@@ -235,7 +310,7 @@ class Home extends Component {
                   >
                   </Calendar>
                   :
-                  <div>Nie wybrano boiska</div>
+                  <div><span className="info">Nie wybrano boiska</span></div>
                 }
               </TabPane>
             </Tabs>
